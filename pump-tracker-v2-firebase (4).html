@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pump Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+            background: white;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+            padding-bottom: 120px;
+        }
+
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .auth-card {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-card h1 {
+            font-size: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="range"],
+        input[type="datetime-local"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: none;
+            height: 80px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .toggle-auth {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .toggle-auth button {
+            background: none;
+            border: none;
+            color: #0f172a;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .tab-btn.active {
+            background: #0f172a;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .logout-btn {
+            float: right;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .alert-box {
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 2px solid #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        .alert-box.urgent {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+
+        .alert-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .alert-box.urgent .alert-label {
+            color: #b91c1c;
+        }
+
+        .time-display {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .alert-box.urgent .time-display {
+            color: #dc2626;
+        }
+
+        .countdown {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .alert-box.urgent .countdown {
+            color: #b91c1c;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .quick-log-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .quick-btn {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        .quick-btn.active {
+            background: #0f172a;
+            color: white;
+            border-color: #0f172a;
+        }
+
+        .quick-log-section {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .log-form {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .session-list {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .session-header {
+            background: #e2e8f0;
+            padding: 12px 16px;
+            border-bottom: 1px solid #cbd5e1;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .session-item {
+            padding: 16px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .session-item:hover {
+            background: #e2e8f0;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .session-time {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .delete-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+        }
+
+        .delete-btn:hover {
+            color: #0f172a;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #64748b;
+            padding: 24px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 24px;
+            color: #64748b;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #0f172a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-msg {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .diaper-counter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .counter-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .counter-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .counter-btn {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            background: #f1f5f9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .counter-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .counter-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="authScreen" class="auth-screen" style="display: none;">
+        <div class="auth-card">
+            <h1 id="authTitle">Sign Up</h1>
+            <div id="errorMsg" class="error-msg" style="display: none;"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="authEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="authPassword" placeholder="at least 6 characters">
+            </div>
+            <button class="btn-primary btn-full" onclick="handleAuth()">Sign Up</button>
+            <div class="toggle-auth">
+                Already have an account? <button onclick="toggleAuthMode()">Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="appScreen" style="display: none;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div></div>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="setTab('home')">Home</button>
+                <button class="tab-btn" onclick="setTab('quicklog')">Quick Log</button>
+                <button class="tab-btn" onclick="setTab('diapers')">Diapers</button>
+                <button class="tab-btn" onclick="setTab('history')">History</button>
+                <button class="tab-btn" onclick="setTab('analytics')">Analytics</button>
+                <button class="tab-btn" onclick="setTab('settings')">⚙️</button>
+            </div>
+
+            <!-- HOME TAB -->
+            <div id="homeTab" class="tab-content active">
+                <h1>Pump Tracker</h1>
+                <p class="subtitle" id="affirmation">You're doing amazing.</p>
+
+                <div id="nextPumpAlert" class="alert-box">
+                    <div class="alert-label">Next Pump Session</div>
+                    <div class="time-display" id="nextPumpTime">--:--</div>
+                    <div class="countdown" id="timeUntilNextPump">Loading...</div>
+                </div>
+
+                <div id="nextFeedAlert" class="alert-box" style="position: relative;">
+                    <div class="alert-label">Next Baby Feed</div>
+                    <div class="time-display" id="nextFeedTime">--:--</div>
+                    <div class="countdown" id="timeUntilNextFeed">Loading...</div>
+                    <button onclick="openEditNextFeedModal()" style="position: absolute; top: 12px; right: 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 12px; color: #475569;">✎ Edit</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="pumpCount">0</div>
+                        <div class="stat-label">Pumps</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="feedCount">0</div>
+                        <div class="stat-label">Breast Feeds</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="bottleCount">0</div>
+                        <div class="stat-label">Bottles</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="babyFeedCount">0</div>
+                        <div class="stat-label">Baby Fed</div>
+                    </div>
+                </div>
+
+                <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; text-align: center; margin-bottom: 24px;">
+                    <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Supply Today</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #0f172a;" id="totalOz">0</div>
+                </div>
+
+                <button class="btn-primary btn-full" style="margin-bottom: 24px;" onclick="setTab('quicklog')">
+                    ⚡ QUICK LOG
+                </button>
+
+                <div class="session-list">
+                    <div class="session-header">Recent Sessions (Today)</div>
+                    <div id="recentSessionsList">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK LOG TAB -->
+            <div id="quicklogTab" class="tab-content">
+                <h1>Quick Log</h1>
+                <p class="subtitle">Fast entry mode</p>
+
+                <!-- Type Selection -->
+                <div class="quick-log-section">
+                    <div class="section-label">What are you doing?</div>
+                    <div class="quick-log-grid">
+                        <button class="quick-btn active" id="typeBtn-pump" onclick="setQuickType('pump')">🔶 Pump</button>
+                        <button class="quick-btn" id="typeBtn-bottle" onclick="setQuickType('bottle')">🍼 Bottle</button>
+                        <button class="quick-btn" id="typeBtn-breastfeed" onclick="setQuickType('breastfeed')">🤱 Breast</button>
+                    </div>
+                </div>
+
+                <!-- Amount (Pump/Bottle only) -->
+                <div id="amountSection" class="quick-log-section">
+                    <div class="section-label" id="amountLabel">How much? (<span id="unitDisplay">oz</span>)</div>
+                    
+                    <!-- Pump (left/right) -->
+                    <div id="pumpAmountSection" style="display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div>
+                                <label style="font-size: 12px; margin-bottom: 4px; display: block;">Left Breast</label>
+                                <input type="number" step="0.1" id="quickLeftAmount" placeholder="0" style="width: 100%; padding: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; margin-bottom: 4px; display: block;">Right Breast</label>
+                                <input type="number" step="0.1" id="quickRightAmount" placeholder="0" style="width: 100%; padding: 8px;">
+                            </div>
+                        </div>
+                        <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; text-align: center;">
+                            <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #0f172a;" id="quickTotalAmount">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Bottle (single amount) -->
+                    <div id="bottleAmountSection">
+                        <div id="bottleOzButtons" class="quick-log-grid">
+                            <button class="quick-btn" onclick="setQuickAmount(4)">4</button>
+                            <button class="quick-btn" onclick="setQuickAmount(5)">5</button>
+                            <button class="quick-btn" onclick="setQuickAmount(6)">6</button>
+                            <button class="quick-btn" onclick="setQuickAmount(7)">7</button>
+                        </div>
+                        <div id="bottleMlButtons" class="quick-log-grid" style="display: none;">
+                            <button class="quick-btn" onclick="setQuickAmount(60)">60</button>
+                            <button class="quick-btn" onclick="setQuickAmount(80)">80</button>
+                            <button class="quick-btn" onclick="setQuickAmount(100)">100</button>
+                            <button class="quick-btn" onclick="setQuickAmount(120)">120</button>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <input type="number" step="0.1" id="quickAmount" placeholder="Custom amount" style="width: 100%; padding: 8px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duration -->
+                <div id="durationSection" class="quick-log-section">
+                    <div class="section-label">Duration (minutes)</div>
+                    <div class="quick-log-grid">
+                        <button class="quick-btn" id="dur-10" onclick="selectDuration(10)">10 min</button>
+                        <button class="quick-btn" id="dur-15" onclick="selectDuration(15)">15 min</button>
+                        <button class="quick-btn" id="dur-20" onclick="selectDuration(20)">20 min</button>
+                        <button class="quick-btn" id="dur-25" onclick="selectDuration(25)">25 min</button>
+                    </div>
+                    <div style="margin-top: 8px; text-align: center; font-size: 12px; color: #64748b;">Selected: <span id="durationDisplay">15 min</span></div>
+                </div>
+
+                <!-- Quick Notes -->
+                <div class="log-form">
+                    <label>Notes (optional)</label>
+                    <textarea id="quickNotes" placeholder="Thrush concerns? Flange size? Engorgement?"></textarea>
+                </div>
+
+                <button class="btn-primary btn-full" onclick="saveQuickLog()" style="margin-bottom: 8px;">✓ Save</button>
+                <button class="btn-secondary btn-full" onclick="setTab('home')">Cancel</button>
+            </div>
+
+            <!-- DIAPERS TAB -->
+            <div id="diapersTab" class="tab-content">
+                <h1>Diaper Tracker</h1>
+                <p class="subtitle" id="diaperDate">Today</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+                    <button class="btn-primary" onclick="addDiaperEntry('wet')">💧 + Wet</button>
+                    <button class="btn-primary" onclick="addDiaperEntry('dirty')">💩 + Dirty</button>
+                </div>
+
+                <div class="session-list">
+                    <div class="session-header">Today's Entries</div>
+                    <div id="diaperEntries">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; padding: 16px; background: #f1f5f9; border-radius: 8px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Wet</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #0f172a;" id="totalWet">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Dirty</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #0f172a;" id="totalDirty">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORY TAB -->
+            <div id="historyTab" class="tab-content">
+                <h1>History</h1>
+                <p class="subtitle">Log past events</p>
+
+                <div class="log-form">
+                    <label>Date & Time</label>
+                    <input type="datetime-local" id="historyDateTime">
+
+                    <label style="margin-top: 12px;">Type</label>
+                    <div class="quick-log-grid" style="margin-bottom: 12px;">
+                        <button class="quick-btn active" id="historyTypeBtn-pump" onclick="setHistoryType('pump')">Pump</button>
+                        <button class="quick-btn" id="historyTypeBtn-bottle" onclick="setHistoryType('bottle')">Bottle</button>
+                        <button class="quick-btn" id="historyTypeBtn-breastfeed" onclick="setHistoryType('breastfeed')">Breast</button>
+                    </div>
+
+                    <div id="historyAmountSection">
+                        <label>Amount (<span id="historyUnitDisplay">oz</span>)</label>
+                        
+                        <div id="historyPumpAmountSection" style="display: none; margin-top: 8px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                                <div>
+                                    <label style="font-size: 12px; margin-bottom: 4px; display: block;">Left Breast</label>
+                                    <input type="number" step="0.1" id="historyLeftAmount" placeholder="0">
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; margin-bottom: 4px; display: block;">Right Breast</label>
+                                    <input type="number" step="0.1" id="historyRightAmount" placeholder="0">
+                                </div>
+                            </div>
+                            <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; text-align: center;">
+                                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #0f172a;" id="historyTotalAmount">0</div>
+                            </div>
+                        </div>
+
+                        <div id="historyBottleAmountSection">
+                            <input type="number" step="0.1" id="historyAmount" placeholder="0" style="margin-top: 8px;">
+                        </div>
+                    </div>
+
+                    <label style="margin-top: 12px;">Duration (min)</label>
+                    <input type="number" id="historyDuration" value="15">
+
+                    <label style="margin-top: 12px;">Notes</label>
+                    <textarea id="historyNotes" placeholder="Any notes?"></textarea>
+
+                    <button class="btn-primary btn-full" onclick="saveHistoryLog()" style="margin-top: 12px; margin-bottom: 8px;">Save</button>
+                </div>
+
+                <div class="session-list" style="margin-top: 24px;">
+                    <div class="session-header">All Sessions</div>
+                    <div id="allSessionsList">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS TAB -->
+            <div id="analyticsTab" class="tab-content">
+                <h1>Analytics</h1>
+                <p class="subtitle">Last 7 days</p>
+
+                <div class="session-list">
+                    <div class="session-header">Supply Trend</div>
+                    <div id="analyticsList">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS TAB -->
+            <div id="settingsTab" class="tab-content">
+                <h1>Settings</h1>
+                <p class="subtitle">Preferences</p>
+
+                <div class="log-form">
+                    <label>Measurement Unit</label>
+                    <div class="quick-log-grid" style="margin-top: 8px;">
+                        <button class="quick-btn active" id="unitBtn-oz" onclick="setUnit('oz')">Ounces (oz)</button>
+                        <button class="quick-btn" id="unitBtn-ml" onclick="setUnit('ml')">Milliliters (ml)</button>
+                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 12px;">Your preference is saved to your account</p>
+                </div>
+
+                <div class="log-form">
+                    <h2 style="font-size: 16px; margin-bottom: 12px;">Account</h2>
+                    <button class="btn-secondary btn-full" onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- EDIT SESSION MODAL -->
+            <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; padding: 20px; overflow-y: auto;">
+                <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; margin: 50px auto;">
+                    <h2 style="margin-bottom: 16px; font-size: 18px;">Edit Session</h2>
+                    
+                    <div class="form-group">
+                        <label>Type</label>
+                        <div class="quick-log-grid" style="margin-bottom: 12px;">
+                            <button class="quick-btn active" id="editTypeBtn-pump" onclick="setEditType('pump')">Pump</button>
+                            <button class="quick-btn" id="editTypeBtn-bottle" onclick="setEditType('bottle')">Bottle</button>
+                            <button class="quick-btn" id="editTypeBtn-breastfeed" onclick="setEditType('breastfeed')">Breast</button>
+                        </div>
+                    </div>
+
+                    <div id="editAmountSection">
+                        <label>Amount (<span id="editUnitDisplay">oz</span>)</label>
+                        <input type="number" step="0.1" id="editAmount" placeholder="0" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    </div>
+
+                    <div id="editDurationSection">
+                        <label>Duration (minutes)</label>
+                        <input type="number" id="editDuration" value="15" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="editNotes" placeholder="Notes..." style="width: 100%; padding: 8px; height: 80px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit;"></textarea>
+                    </div>
+
+                    <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="saveEditedSession()">Save Changes</button>
+                    <button class="btn-secondary" style="width: 100%;" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </div>
+
+            <!-- EDIT NEXT FEED MODAL -->
+            <div id="editNextFeedModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; padding: 20px; overflow-y: auto;">
+                <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; margin: 50px auto;">
+                    <h2 style="margin-bottom: 16px; font-size: 18px;">Edit Next Baby Feed</h2>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Set when the next feed should happen (3 hours from last feed by default)</p>
+                    
+                    <label>Date</label>
+                    <input type="date" id="editNextFeedDate" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+
+                    <label>Time</label>
+                    <input type="time" id="editNextFeedTime" style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #cbd5e1; border-radius: 6px;">
+
+                    <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="saveNextFeedOverride()">Save New Time</button>
+                    <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="clearNextFeedOverride()">Reset to Default (3h)</button>
+                    <button class="btn-secondary" style="width: 100%;" onclick="closeEditNextFeedModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbEiogvrrO4Oxt0pt4EEEfTVGnmNb6f8s",
+            authDomain: "pump-tracker-e1041.firebaseapp.com",
+            projectId: "pump-tracker-e1041",
+            storageBucket: "pump-tracker-e1041.firebasestorage.app",
+            messagingSenderId: "713884469970",
+            appId: "1:713884469970:web:c7405f3b9706f92d94fb0b"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let isSignUp = true;
+        let currentTab = 'home';
+        let quickType = 'pump';
+        let quickAmount = 5;
+        let quickLeftAmount = 0;
+        let quickRightAmount = 0;
+        let quickDuration = 15;
+        let historyType = 'pump';
+        let userUnit = 'oz'; // oz or ml
+        let editSessionId = null;
+        let currentNextFeedTime = new Date(); // Store the actual next feed time
+
+        const affirmations = [
+            "You're doing amazing.",
+            "Your baby is lucky to have you.",
+            "Rest when you can.",
+            "One more session. You've got this.",
+            "Hydrate and keep going.",
+            "You're stronger than this.",
+            "This is temporary."
+        ];
+
+        // Auth
+        function toggleAuthMode() {
+            isSignUp = !isSignUp;
+            document.getElementById('authTitle').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+        }
+
+        function handleAuth() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!email || !password) {
+                errorMsg.textContent = 'Please fill in all fields';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (isSignUp) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(user => {
+                        showApp();
+                    })
+                    .catch(error => {
+                        errorMsg.textContent = error.message;
+                        errorMsg.style.display = 'block';
+                    });
+            } else {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(user => {
+                        showApp();
+                    })
+                    .catch(error => {
+                        errorMsg.textContent = error.message;
+                        errorMsg.style.display = 'block';
+                    });
+            }
+        }
+
+        function handleLogout() {
+            auth.signOut().then(() => {
+                currentUser = null;
+                showAuth();
+            });
+        }
+
+        function showAuth() {
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('appScreen').style.display = 'none';
+        }
+
+        function showApp() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            
+            // Request notification permission
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            
+            // Initialize UI
+            setQuickType('pump'); // Start with pump mode
+            
+            loadUserPreferences();
+            loadData();
+            updateNextPump(); // Load next pump time
+            updateNextFeed(); // Load next feed time
+            
+            // Update countdown display every second
+            setInterval(updateSchedules, 1000);
+            
+            setInterval(() => {
+                document.getElementById('affirmation').textContent = affirmations[Math.floor(Math.random() * affirmations.length)];
+            }, 1800000);
+            setDateTimeDefault();
+        }
+
+        function loadUserPreferences() {
+            if (!currentUser) return;
+            db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').get()
+                .then(doc => {
+                    if (doc.exists) {
+                        userUnit = doc.data().unit || 'oz';
+                    }
+                    updateUnitDisplay();
+                })
+                .catch(() => {
+                    userUnit = 'oz';
+                    updateUnitDisplay();
+                });
+        }
+
+        function selectDuration(dur) {
+            quickDuration = dur;
+            // Remove active from all duration buttons
+            document.querySelectorAll('#dur-10, #dur-15, #dur-20, #dur-25').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active to selected button
+            document.getElementById('dur-' + dur).classList.add('active');
+            // Update display
+            document.getElementById('durationDisplay').textContent = dur + ' min';
+        }
+
+        function updateUnitDisplay() {
+            document.getElementById('unitDisplay').textContent = userUnit;
+            document.getElementById('historyUnitDisplay').textContent = userUnit;
+            document.getElementById('unitBtn-oz').classList.toggle('active', userUnit === 'oz');
+            document.getElementById('unitBtn-ml').classList.toggle('active', userUnit === 'ml');
+            
+            // Update bottle amount buttons based on unit
+            document.getElementById('bottleOzButtons').style.display = userUnit === 'oz' ? 'grid' : 'none';
+            document.getElementById('bottleMlButtons').style.display = userUnit === 'ml' ? 'grid' : 'none';
+        }
+
+        function setUnit(unit) {
+            if (!currentUser) return;
+            userUnit = unit;
+            db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').set({
+                unit: unit
+            }, { merge: true });
+            updateUnitDisplay();
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            document.querySelector(`[onclick="setTab('${tab}')"]`).classList.add('active');
+
+            if (tab === 'analytics') {
+                loadAnalytics();
+            } else if (tab === 'history') {
+                loadAllSessions();
+            } else if (tab === 'diapers') {
+                loadDiapers();
+            } else if (tab === 'settings') {
+                loadUserPreferences();
+            }
+        }
+
+        // Quick Log functions
+        function setQuickType(type) {
+            quickType = type;
+            document.querySelectorAll('#typeBtn-pump, #typeBtn-bottle, #typeBtn-breastfeed').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('typeBtn-' + type).classList.add('active');
+            
+            const durationSection = document.getElementById('durationSection');
+            const pumpAmountSection = document.getElementById('pumpAmountSection');
+            const bottleAmountSection = document.getElementById('bottleAmountSection');
+            
+            if (type === 'breastfeed') {
+                document.getElementById('amountSection').style.display = 'none';
+                durationSection.style.display = 'block';
+            } else if (type === 'pump') {
+                document.getElementById('amountSection').style.display = 'block';
+                pumpAmountSection.style.display = 'block';
+                bottleAmountSection.style.display = 'none';
+                durationSection.style.display = 'block';
+            } else if (type === 'bottle') {
+                document.getElementById('amountSection').style.display = 'block';
+                pumpAmountSection.style.display = 'none';
+                bottleAmountSection.style.display = 'block';
+                durationSection.style.display = 'block';
+                // Update bottle buttons based on current unit
+                document.getElementById('bottleOzButtons').style.display = userUnit === 'oz' ? 'grid' : 'none';
+                document.getElementById('bottleMlButtons').style.display = userUnit === 'ml' ? 'grid' : 'none';
+            }
+        }
+
+        function setQuickAmount(amt) {
+            quickAmount = amt;
+            document.getElementById('quickAmount').value = amt;
+        }
+
+        function updateQuickBreastAmounts() {
+            const left = parseFloat(document.getElementById('quickLeftAmount').value) || 0;
+            const right = parseFloat(document.getElementById('quickRightAmount').value) || 0;
+            quickLeftAmount = left;
+            quickRightAmount = right;
+            const total = left + right;
+            document.getElementById('quickTotalAmount').textContent = total.toFixed(1);
+        }
+
+        function setQuickDuration(dur) {
+            quickDuration = dur;
+        }
+
+        function saveQuickLog() {
+            if (!currentUser) return;
+
+            let amount = 0;
+            
+            if (quickType === 'pump') {
+                const left = parseFloat(document.getElementById('quickLeftAmount').value) || 0;
+                const right = parseFloat(document.getElementById('quickRightAmount').value) || 0;
+                amount = left + right;
+                if (amount === 0) {
+                    alert('Enter amount for at least one breast');
+                    return;
+                }
+            } else if (quickType === 'bottle') {
+                amount = parseFloat(document.getElementById('quickAmount').value) || quickAmount;
+                if (amount === 0) {
+                    alert('Enter amount');
+                    return;
+                }
+            }
+
+            const notes = document.getElementById('quickNotes').value;
+
+            const session = {
+                type: quickType,
+                timestamp: new Date().toISOString(),
+                amount: amount,
+                unit: userUnit,
+                duration: quickDuration,
+                notes: notes,
+                painLevel: 0
+            };
+
+            db.collection('users').doc(currentUser.uid).collection('sessions').add(session)
+                .then(() => {
+                    document.getElementById('quickNotes').value = '';
+                    document.getElementById('quickAmount').value = '';
+                    document.getElementById('quickLeftAmount').value = '';
+                    document.getElementById('quickRightAmount').value = '';
+                    document.getElementById('quickTotalAmount').textContent = '0';
+                    
+                    // If it's a baby feed (bottle or breastfeed), clear the manual override
+                    if (quickType === 'bottle' || quickType === 'breastfeed') {
+                        db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').set({
+                            nextFeedOverride: null
+                        }, { merge: true })
+                        .then(() => {
+                            loadData();
+                            setTab('home');
+                        })
+                        .catch(() => {
+                            loadData();
+                            setTab('home');
+                        });
+                    } else {
+                        loadData();
+                        setTab('home');
+                    }
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        // History functions
+        function setDateTimeDefault() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('historyDateTime').value = `${year}-${month}-${day}T${hours}:${mins}`;
+        }
+
+        function setHistoryType(type) {
+            historyType = type;
+            document.querySelectorAll('#historyTypeBtn-pump, #historyTypeBtn-bottle, #historyTypeBtn-breastfeed').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('historyTypeBtn-' + type).classList.add('active');
+            
+            const pumpSection = document.getElementById('historyPumpAmountSection');
+            const bottleSection = document.getElementById('historyBottleAmountSection');
+            
+            if (type === 'pump') {
+                pumpSection.style.display = 'block';
+                bottleSection.style.display = 'none';
+            } else if (type === 'bottle') {
+                pumpSection.style.display = 'none';
+                bottleSection.style.display = 'block';
+            } else if (type === 'breastfeed') {
+                pumpSection.style.display = 'none';
+                bottleSection.style.display = 'none';
+            }
+        }
+
+        function updateHistoryBreastAmounts() {
+            const left = parseFloat(document.getElementById('historyLeftAmount').value) || 0;
+            const right = parseFloat(document.getElementById('historyRightAmount').value) || 0;
+            const total = left + right;
+            document.getElementById('historyTotalAmount').textContent = total.toFixed(1);
+        }
+
+        function saveHistoryLog() {
+            if (!currentUser) return;
+
+            const dateTime = document.getElementById('historyDateTime').value;
+            let amount = 0;
+
+            if (historyType === 'pump') {
+                const left = parseFloat(document.getElementById('historyLeftAmount').value) || 0;
+                const right = parseFloat(document.getElementById('historyRightAmount').value) || 0;
+                amount = left + right;
+                if (amount === 0) {
+                    alert('Enter amount for at least one breast');
+                    return;
+                }
+            } else if (historyType === 'bottle') {
+                amount = parseFloat(document.getElementById('historyAmount').value) || 0;
+                if (amount === 0) {
+                    alert('Enter amount');
+                    return;
+                }
+            }
+            // Feed and Breastfeed don't require amount
+
+            if (!dateTime) {
+                alert('Select date and time');
+                return;
+            }
+
+            const duration = parseInt(document.getElementById('historyDuration').value) || 0;
+            const notes = document.getElementById('historyNotes').value;
+
+            const session = {
+                type: historyType,
+                timestamp: new Date(dateTime).toISOString(),
+                amount: amount,
+                unit: userUnit,
+                duration: duration,
+                notes: notes,
+                painLevel: 0
+            };
+
+            db.collection('users').doc(currentUser.uid).collection('sessions').add(session)
+                .then(() => {
+                    document.getElementById('historyNotes').value = '';
+                    document.getElementById('historyAmount').value = '';
+                    document.getElementById('historyLeftAmount').value = '';
+                    document.getElementById('historyRightAmount').value = '';
+                    document.getElementById('historyTotalAmount').textContent = '0';
+                    setDateTimeDefault();
+                    
+                    // If it's a baby feed (bottle or breastfeed), clear the manual override
+                    if (historyType === 'bottle' || historyType === 'breastfeed') {
+                        db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').set({
+                            nextFeedOverride: null
+                        }, { merge: true })
+                        .then(() => {
+                            loadAllSessions();
+                            loadData(); // Also update home page
+                        })
+                        .catch(() => {
+                            loadAllSessions();
+                            loadData();
+                        });
+                    } else {
+                        loadAllSessions();
+                    }
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        function loadAllSessions() {
+            if (!currentUser) return;
+
+            db.collection('users').doc(currentUser.uid).collection('sessions')
+                .orderBy('timestamp', 'desc')
+                .limit(100)
+                .onSnapshot(snapshot => {
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const session = doc.data();
+                        const date = new Date(session.timestamp);
+                        const typeEmoji = session.type === 'pump' ? '🔶' : 
+                                         session.type === 'bottle' ? '🍼' : '🤱';
+                        const unit = session.unit || 'oz';
+                        html += `
+                            <div class="session-item">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div style="flex: 1;">
+                                        <div class="session-title">${typeEmoji} ${session.type.toUpperCase()} ${session.amount > 0 ? session.amount + unit : session.duration > 0 ? session.duration + 'min' : ''}</div>
+                                        <div class="session-time">${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})}</div>
+                                        ${session.notes ? `<div style="font-size: 12px; margin-top: 8px; padding: 8px; background: white; border-radius: 4px; border-left: 3px solid #cbd5e1;">${session.notes}</div>` : ''}
+                                    </div>
+                                    <div style="display: flex; gap: 4px; margin-left: 8px;">
+                                        <button class="delete-btn" onclick="openEditModal('${doc.id}', '${JSON.stringify(session).replace(/'/g, "&apos;")}')" style="font-size: 14px; padding: 4px 8px; background: #e2e8f0; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">✎</button>
+                                        <button class="delete-btn" onclick="deleteSession('${doc.id}')" style="font-size: 14px; padding: 4px 8px; background: #fca5a5; border: 1px solid #f87171; border-radius: 4px; cursor: pointer;">✕</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    document.getElementById('allSessionsList').innerHTML = html || '<div class="empty-state">No sessions yet</div>';
+                });
+        }
+
+        function deleteSession(id) {
+            if (!currentUser) return;
+            db.collection('users').doc(currentUser.uid).collection('sessions').doc(id).delete()
+                .then(() => {
+                    // Clear the override so next feed time recalculates
+                    db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').set({
+                        nextFeedOverride: null
+                    }, { merge: true })
+                    .then(() => {
+                        loadData();
+                        loadAllSessions();
+                    })
+                    .catch(() => {
+                        loadData();
+                        loadAllSessions();
+                    });
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        // Diaper functions
+        function addDiaperEntry(type) {
+            if (!currentUser) return;
+            const today = new Date().toDateString();
+            
+            const entry = {
+                type: type,
+                timestamp: new Date().toISOString()
+            };
+
+            db.collection('users').doc(currentUser.uid).collection('diapers').doc(today).update({
+                entries: firebase.firestore.FieldValue.arrayUnion(entry)
+            }).catch(() => {
+                db.collection('users').doc(currentUser.uid).collection('diapers').doc(today).set({
+                    entries: [entry]
+                });
+            });
+            
+            setTimeout(loadDiapers, 300);
+        }
+
+        function deleteDiaperEntry(index) {
+            if (!currentUser) return;
+            const today = new Date().toDateString();
+            
+            db.collection('users').doc(currentUser.uid).collection('diapers').doc(today).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const entries = doc.data().entries || [];
+                        if (index >= 0 && index < entries.length) {
+                            entries.splice(index, 1);
+                            db.collection('users').doc(currentUser.uid).collection('diapers').doc(today).update({
+                                entries: entries
+                            });
+                            loadDiapers();
+                        }
+                    }
+                });
+        }
+
+        function loadDiapers() {
+            if (!currentUser) return;
+            const today = new Date().toDateString();
+            db.collection('users').doc(currentUser.uid).collection('diapers').doc(today).onSnapshot(doc => {
+                let html = '';
+                let totalWet = 0;
+                let totalDirty = 0;
+                
+                if (doc.exists && doc.data().entries) {
+                    const entries = doc.data().entries;
+                    // Sort by timestamp descending (newest first)
+                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    entries.forEach((entry, index) => {
+                        const date = new Date(entry.timestamp);
+                        const emoji = entry.type === 'wet' ? '💧' : '💩';
+                        const label = entry.type === 'wet' ? 'Wet' : 'Dirty';
+                        
+                        if (entry.type === 'wet') totalWet++;
+                        if (entry.type === 'dirty') totalDirty++;
+                        
+                        html += `
+                            <div class="session-item">
+                                <button class="delete-btn" onclick="deleteDiaperEntry(${entries.indexOf(entry)})">✕</button>
+                                <div class="session-title">${emoji} ${label}</div>
+                                <div class="session-time">${date.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', second:'2-digit'})}</div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById('diaperEntries').innerHTML = html || '<div class="empty-state">No entries yet</div>';
+                document.getElementById('totalWet').textContent = totalWet;
+                document.getElementById('totalDirty').textContent = totalDirty;
+            });
+        }
+
+        // Main data loading
+        function loadData() {
+            if (!currentUser) return;
+            const today = new Date().toDateString();
+
+            db.collection('users').doc(currentUser.uid).collection('sessions')
+                .where('timestamp', '>=', new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
+                .orderBy('timestamp', 'desc')
+                .limit(5)
+                .onSnapshot(snapshot => {
+                    let html = '';
+                    let pumpCount = 0;
+                    let feedCount = 0;
+                    let bottleCount = 0;
+                    let babyFeedCount = 0;
+                    let totalOz = 0;
+                    let totalMl = 0;
+
+                    snapshot.forEach(doc => {
+                        const session = doc.data();
+                        if (new Date(session.timestamp).toDateString() === today) {
+                            if (session.type === 'pump') {
+                                pumpCount++;
+                                const unit = session.unit || 'oz';
+                                if (unit === 'oz') {
+                                    totalOz += session.amount || 0;
+                                } else {
+                                    totalMl += session.amount || 0;
+                                }
+                            } else if (session.type === 'breastfeed') {
+                                feedCount++;
+                                babyFeedCount++; // Breastfeed = baby is fed
+                            } else if (session.type === 'bottle') {
+                                bottleCount++;
+                                babyFeedCount++; // Bottle = baby is fed
+                                const unit = session.unit || 'oz';
+                                if (unit === 'oz') {
+                                    totalOz += session.amount || 0;
+                                } else {
+                                    totalMl += session.amount || 0;
+                                }
+                            }
+                        }
+
+                        const date = new Date(session.timestamp);
+                        const typeEmoji = session.type === 'pump' ? '🔶' : 
+                                         session.type === 'bottle' ? '🍼' : '🤱';
+                        const unit = session.unit || 'oz';
+                        html += `
+                            <div class="session-item">
+                                <button class="delete-btn" onclick="deleteSession('${doc.id}')">✕</button>
+                                <div class="session-title">${typeEmoji} ${session.type === 'pump' || session.type === 'bottle' ? session.amount + unit : session.duration + 'min'}</div>
+                                <div class="session-time">${date.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})}</div>
+                            </div>
+                        `;
+                    });
+
+                    document.getElementById('pumpCount').textContent = pumpCount;
+                    document.getElementById('feedCount').textContent = feedCount;
+                    document.getElementById('bottleCount').textContent = bottleCount;
+                    document.getElementById('babyFeedCount').textContent = babyFeedCount;
+                    const totalDisplay = userUnit === 'oz' ? totalOz.toFixed(1) : totalMl.toFixed(1);
+                    document.getElementById('totalOz').textContent = totalDisplay;
+                    document.getElementById('recentSessionsList').innerHTML = html || '<div class="empty-state">No sessions yet</div>';
+
+                    // Update next feed when sessions change
+                    updateNextFeed();
+                });
+        }
+
+        function updateSchedules() {
+            // Only update the countdown display, don't recalculate times
+            updateCountdownDisplays();
+        }
+
+        function updateCountdownDisplays() {
+            // Update pump countdown
+            const now = new Date();
+            const nextPumpTime = document.getElementById('nextPumpTime')?.textContent;
+            if (nextPumpTime && nextPumpTime !== '--:--') {
+                // Parse the time - it's in HH:MM format already
+                const [pumpHours, pumpMinutes] = nextPumpTime.split(':');
+                let nextPumpDate = new Date();
+                nextPumpDate.setHours(parseInt(pumpHours), parseInt(pumpMinutes), 0);
+                
+                // If time has passed today, assume it's tomorrow
+                if (nextPumpDate < now) {
+                    nextPumpDate.setDate(nextPumpDate.getDate() + 1);
+                }
+                
+                const pumpDiff = nextPumpDate - now;
+                if (pumpDiff <= 0) {
+                    document.getElementById('timeUntilNextPump').textContent = 'Time now ⏰';
+                    document.getElementById('nextPumpAlert').classList.add('urgent');
+                } else {
+                    const hours = Math.floor(pumpDiff / 3600000);
+                    const minutes = Math.floor((pumpDiff % 3600000) / 60000);
+                    document.getElementById('timeUntilNextPump').textContent = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                    document.getElementById('nextPumpAlert').classList.toggle('urgent', false);
+                }
+            }
+
+            // Update feed countdown
+            const nextFeedTime = document.getElementById('nextFeedTime')?.textContent;
+            if (nextFeedTime && nextFeedTime !== '--:--') {
+                const feedDiff = currentNextFeedTime - now;
+                if (feedDiff <= 0) {
+                    document.getElementById('timeUntilNextFeed').textContent = 'Time to feed 👶';
+                    document.getElementById('nextFeedAlert').classList.add('urgent');
+                } else {
+                    const hours = Math.floor(feedDiff / 3600000);
+                    const minutes = Math.floor((feedDiff % 3600000) / 60000);
+                    document.getElementById('timeUntilNextFeed').textContent = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                    document.getElementById('nextFeedAlert').classList.toggle('urgent', false);
+                }
+            }
+        }
+
+        function updateNextPump() {
+            if (!currentUser) return;
+
+            db.collection('users').doc(currentUser.uid).collection('sessions')
+                .where('type', '==', 'pump')
+                .orderBy('timestamp', 'desc')
+                .limit(1)
+                .onSnapshot(snapshot => {
+                    let nextTime = new Date();
+                    
+                    if (!snapshot.empty) {
+                        const lastPump = snapshot.docs[0].data();
+                        nextTime = new Date(new Date(lastPump.timestamp).getTime() + 180 * 60000); // 3 hours
+                    }
+
+                    const now = new Date();
+                    const isOverdue = nextTime <= now;
+                    const alert = document.getElementById('nextPumpAlert');
+                    if (alert) {
+                        alert.classList.toggle('urgent', isOverdue);
+                        document.getElementById('nextPumpTime').textContent = nextTime.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
+
+                        const diff = nextTime - now;
+                        if (diff <= 0) {
+                            document.getElementById('timeUntilNextPump').textContent = 'Time now ⏰';
+                        } else {
+                            const hours = Math.floor(diff / 3600000);
+                            const minutes = Math.floor((diff % 3600000) / 60000);
+                            document.getElementById('timeUntilNextPump').textContent = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                        }
+                    }
+
+                    // Schedule notification
+                    scheduleNotification(nextTime, '🔶 Time to pump!', 'nextPump');
+                });
+        }
+
+        function updateNextFeed() {
+            if (!currentUser) return;
+
+            db.collection('users').doc(currentUser.uid).collection('sessions')
+                .where('type', 'in', ['bottle', 'breastfeed'])
+                .orderBy('timestamp', 'desc')
+                .limit(1)
+                .get()
+                .then(snapshot => {
+                    let nextTime = new Date();
+                    
+                    if (!snapshot.empty) {
+                        const lastFeed = snapshot.docs[0].data();
+                        const lastFeedTime = new Date(lastFeed.timestamp);
+                        
+                        // Check if there's a custom override for next feed time
+                        db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').get()
+                            .then(doc => {
+                                if (doc.exists && doc.data().nextFeedOverride) {
+                                    nextTime = new Date(doc.data().nextFeedOverride);
+                                } else {
+                                    // Default: 3 hours after last feed
+                                    nextTime = new Date(lastFeedTime.getTime() + 180 * 60000);
+                                }
+                                displayNextFeed(nextTime);
+                            })
+                            .catch(() => {
+                                // Default: 3 hours after last feed
+                                nextTime = new Date(lastFeedTime.getTime() + 180 * 60000);
+                                displayNextFeed(nextTime);
+                            });
+                    } else {
+                        displayNextFeed(nextTime);
+                    }
+                })
+                .catch(error => console.log('Error loading next feed:', error));
+        }
+
+        function displayNextFeed(nextTime) {
+            // Store the actual next feed time
+            currentNextFeedTime = nextTime;
+            
+            const now = new Date();
+            const isOverdue = nextTime <= now;
+            const alert = document.getElementById('nextFeedAlert');
+            if (alert) {
+                alert.classList.toggle('urgent', isOverdue);
+                document.getElementById('nextFeedTime').textContent = nextTime.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
+
+                const diff = nextTime - now;
+                if (diff <= 0) {
+                    document.getElementById('timeUntilNextFeed').textContent = 'Time to feed 👶';
+                } else {
+                    const hours = Math.floor(diff / 3600000);
+                    const minutes = Math.floor((diff % 3600000) / 60000);
+                    document.getElementById('timeUntilNextFeed').textContent = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                }
+            }
+
+            // Schedule notification
+            scheduleNotification(nextTime, '👶 Time to feed baby!', 'nextFeed');
+        }
+
+        function openEditNextFeedModal() {
+            // Use the stored nextTime instead of parsing the display text
+            // Use local timezone, not UTC
+            const year = currentNextFeedTime.getFullYear();
+            const month = String(currentNextFeedTime.getMonth() + 1).padStart(2, '0');
+            const day = String(currentNextFeedTime.getDate()).padStart(2, '0');
+            const dateStr = year + '-' + month + '-' + day;
+            
+            const hours = String(currentNextFeedTime.getHours()).padStart(2, '0');
+            const minutes = String(currentNextFeedTime.getMinutes()).padStart(2, '0');
+            const timeStr = hours + ':' + minutes;
+            
+            document.getElementById('editNextFeedDate').value = dateStr;
+            document.getElementById('editNextFeedTime').value = timeStr;
+            document.getElementById('editNextFeedModal').style.display = 'block';
+        }
+
+        function closeEditNextFeedModal() {
+            document.getElementById('editNextFeedModal').style.display = 'none';
+        }
+
+        function saveNextFeedOverride() {
+            if (!currentUser) return;
+
+            const date = document.getElementById('editNextFeedDate').value;
+            const time = document.getElementById('editNextFeedTime').value;
+            
+            if (!date || !time) {
+                alert('Select date and time');
+                return;
+            }
+
+            const nextFeedTime = new Date(date + 'T' + time + ':00').toISOString();
+
+            db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').set({
+                nextFeedOverride: nextFeedTime
+            }, { merge: true })
+            .then(() => {
+                closeEditNextFeedModal();
+                updateNextFeed();
+            })
+            .catch(error => alert('Error: ' + error.message));
+        }
+
+        function clearNextFeedOverride() {
+            if (!currentUser) return;
+
+            db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').set({
+                nextFeedOverride: null
+            }, { merge: true })
+            .then(() => {
+                closeEditNextFeedModal();
+                updateNextFeed();
+            })
+            .catch(error => alert('Error: ' + error.message));
+        }
+
+        function scheduleNotification(targetTime, title, notificationId) {
+            const now = new Date();
+            const timeUntil = targetTime - now;
+            
+            // Don't schedule if already past
+            if (timeUntil <= 0) return;
+            
+            // Notify 5 minutes before
+            const notifyTime = timeUntil - (5 * 60 * 1000);
+            
+            if (notifyTime > 0) {
+                setTimeout(() => {
+                    sendNotification(title, {
+                        body: 'Get ready!',
+                        icon: '👶',
+                        badge: '🔔'
+                    });
+                }, notifyTime);
+            }
+        }
+
+        function sendNotification(title, options) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, options);
+            }
+        }
+
+        function loadAnalytics() {
+            if (!currentUser) return;
+
+            db.collection('users').doc(currentUser.uid).collection('sessions')
+                .where('type', 'in', ['pump', 'bottle'])
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    const dataByDate = {};
+                    snapshot.forEach(doc => {
+                        const session = doc.data();
+                        const unit = session.unit || 'oz';
+                        const date = new Date(session.timestamp).toLocaleDateString('en-US', {month: 'short', day:'numeric'});
+                        if (!dataByDate[date]) dataByDate[date] = { oz: 0, ml: 0 };
+                        if (unit === 'oz') {
+                            dataByDate[date].oz += session.amount || 0;
+                        } else {
+                            dataByDate[date].ml += session.amount || 0;
+                        }
+                    });
+
+                    let html = '';
+                    Object.entries(dataByDate).reverse().slice(0, 7).forEach(([date, totals]) => {
+                        const displayTotal = userUnit === 'oz' ? totals.oz : totals.ml;
+                        html += `
+                            <div class="session-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                    <span style="width: 50px; font-weight: 600;">${date}</span>
+                                    <div style="flex: 1; height: 24px; background: #cbd5e1; border-radius: 4px; overflow: hidden;">
+                                        <div style="height: 100%; background: #475569; width: ${Math.min(displayTotal * 3, 200)}px;"></div>
+                                    </div>
+                                    <span style="width: 50px; text-align: right; font-weight: 600;">${displayTotal.toFixed(1)} ${userUnit}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    document.getElementById('analyticsList').innerHTML = html || '<div class="empty-state">No data yet</div>';
+                });
+        }
+
+        // Initialize
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                showApp();
+            } else {
+                currentUser = null;
+                showAuth();
+            }
+        });
+
+        // Add event listeners for breast amount inputs
+        function openEditModal(sessionId, sessionData) {
+            editSessionId = sessionId;
+            const session = JSON.parse(sessionData.replace(/&apos;/g, "'"));
+            
+            // Set type
+            setEditType(session.type);
+            
+            // Set amount and unit
+            document.getElementById('editUnitDisplay').textContent = session.unit || 'oz';
+            if (session.type !== 'breastfeed') {
+                document.getElementById('editAmount').value = session.amount || 0;
+            }
+            
+            // Set duration
+            document.getElementById('editDuration').value = session.duration || 0;
+            
+            // Set notes
+            document.getElementById('editNotes').value = session.notes || '';
+            
+            // Show modal
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editSessionId = null;
+        }
+
+        function setEditType(type) {
+            document.querySelectorAll('#editTypeBtn-pump, #editTypeBtn-bottle, #editTypeBtn-breastfeed').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('editTypeBtn-' + type).classList.add('active');
+            document.getElementById('editAmountSection').style.display = type === 'breastfeed' ? 'none' : 'block';
+        }
+
+        function saveEditedSession() {
+            if (!currentUser || !editSessionId) return;
+            
+            const type = document.getElementById('editTypeBtn-pump').classList.contains('active') ? 'pump' : 
+                        document.getElementById('editTypeBtn-bottle').classList.contains('active') ? 'bottle' : 'breastfeed';
+            
+            const amount = type === 'breastfeed' ? 0 : parseFloat(document.getElementById('editAmount').value) || 0;
+            const duration = parseInt(document.getElementById('editDuration').value) || 0;
+            const notes = document.getElementById('editNotes').value;
+            
+            const updates = {
+                type: type,
+                amount: amount,
+                duration: duration,
+                notes: notes,
+                unit: userUnit
+            };
+            
+            db.collection('users').doc(currentUser.uid).collection('sessions').doc(editSessionId).update(updates)
+                .then(() => {
+                    closeEditModal();
+                    
+                    // If it's a baby feed (bottle or breastfeed), clear the manual override
+                    if (type === 'bottle' || type === 'breastfeed') {
+                        db.collection('users').doc(currentUser.uid).collection('preferences').doc('settings').set({
+                            nextFeedOverride: null
+                        }, { merge: true })
+                        .then(() => {
+                            loadAllSessions();
+                            loadData();
+                        })
+                        .catch(() => {
+                            loadAllSessions();
+                            loadData();
+                        });
+                    } else {
+                        loadAllSessions();
+                        loadData();
+                    }
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const quickLeftInput = document.getElementById('quickLeftAmount');
+            const quickRightInput = document.getElementById('quickRightAmount');
+            const historyLeftInput = document.getElementById('historyLeftAmount');
+            const historyRightInput = document.getElementById('historyRightAmount');
+            
+            if (quickLeftInput) quickLeftInput.addEventListener('input', updateQuickBreastAmounts);
+            if (quickRightInput) quickRightInput.addEventListener('input', updateQuickBreastAmounts);
+            if (historyLeftInput) historyLeftInput.addEventListener('input', updateHistoryBreastAmounts);
+            if (historyRightInput) historyRightInput.addEventListener('input', updateHistoryBreastAmounts);
+            
+            // Initialize duration button
+            selectDuration(15);
+        });
+    </script>
+</body>
+</html>
